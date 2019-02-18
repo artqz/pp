@@ -3,8 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.8.1",
+    "axios": "^0.18.0",
+    "dropbox": "^4.0.15",
+    "isomorphic-fetch": "^2.2.1",
+    "moment": "^2.24.0",
+    "react": "next",
+    "react-audioplayer": "^0.3.1",
     "react-dom": "^16.8.1",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.5"
   },
   "scripts": {
