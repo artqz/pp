@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
 
-class Yandex extends Component { 
+class Dropbox extends Component { 
   componentDidMount () {
     if (this.props.location.hash !== '') {
       const accessToken = /access_token=([^&]+)/.exec(this.props.location.hash)[1];
@@ -18,4 +18,4 @@ class Yandex extends Component {
   };
 }
 
-export default Yandex;
+export default Dropbox;

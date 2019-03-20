@@ -1,0 +1,16 @@
+.track_list {
+  margin-left: 20px;
+}
+
+.night .track_list .current_track {
+  color: #532471;
+}
+
+.track_list .track {
+  color: grey;
+  cursor: pointer;
+}
+
+.track .track_name {
+  margin-left: 10px;
+}
