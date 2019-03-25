@@ -5,8 +5,8 @@ import './NavBar.css';
 
 function NavBar() {
   const ydClientId = '7f12f06a9a954a5d8d16c1d99cae62fa';
-  const ydRedirectUri = 'https://serov112.ru/yandex/callback';
-  const dbRedirectUri = 'https://serov112.ru/dropbox/callback';
+  const ydRedirectUri = process.env.REACT_APP_BASE_URL + '/yandex/callback';
+  const dbRedirectUri = process.env.REACT_APP_BASE_URL + '/dropbox/callback';
 
   const yd_token = localStorage.getItem('yd_access_token');
   const db_token = localStorage.getItem('db_access_token');

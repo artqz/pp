@@ -1,16 +1,14 @@
 import React, { useContext, useEffect } from 'react';
-import { search_mp3, db_connect } from '../Providers';
+import { search_mp3 } from '../Providers';
 import { AudioContext } from '../context/AudioContext';
 import TrackList from '../components/trackList/TrackList';
 import Audio from '../components/audio/Audio';
+import Explorer from '../components/explorer/Explorer';
 
 function Home() {
   const { state, dispatch } = useContext(AudioContext);
 
   useEffect(() => {
-    db_connect().then(res => {
-      console.log(res);
-    });
     console.log('Player status:');
     if (localStorage.getItem('db_access_token')) {
       console.log('- Dropbox token found!');
@@ -39,6 +37,7 @@ function Home() {
 
   return state.list[state.currentTrack] ? (
     <div>
+      <Explorer />
       <TrackList list={state.list} />
       <Audio track={state.list[state.currentTrack].path} />
     </div>
