@@ -30,7 +30,7 @@ const Explorer = () => {
 
   const list = !loading ? (
     entries.map((entry, index) => (
-      <Entry key={entry.id} entry={entry} handleClick={handleClick} />
+      <Folder key={entry.id} folder={entry} handleClick={handleClick} />
     ))
   ) : (
     <div>loading...</div>
@@ -46,24 +46,16 @@ const Explorer = () => {
 
 export default Explorer;
 
-const Entry = ({ entry, handleClick }) => {
-  let icon, type;
-  if (entry['.tag'] === 'folder') {
-    icon = <i className="fas fa-folder-open" />;
-    type = 'folder';
-  } else {
-    icon = <i className="fas fa-file-audio" />;
-    type = 'audio';
-  }
-  return (
+const Folder = ({ folder, handleClick }) => {
+  return folder['.tag'] === 'folder' ? (
     <div
       onClick={() => {
-        handleClick(entry);
+        handleClick(folder);
       }}
     >
-      {icon} {entry.name}
+      <i className="fas fa-folder" /> {folder.name}
     </div>
-  );
+  ) : null;
 };
 
 const Breadcrumb = ({ breadcrumb, goToSelectedPath }) => {
