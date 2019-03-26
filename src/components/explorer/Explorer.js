@@ -3,86 +3,112 @@ import { list_folder } from '../../Providers';
 
 const Explorer = () => {
   const [path, setPath] = useState('');
-  const [breadcrumb, setBreadcrumb] = useState([]);
-  const [entries, setEntries] = useState({});
+  const [state, setState] = useState({});
+  const [data, setDate] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const treeGeneratorRoot = data => {
+    const tree = {};
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i]['.tag'] === 'folder') {
+        const item = {
+          name: data[i].name,
+          path: data[i].path_lower,
+          type: data[i]['.tag'],
+          isRoot: true,
+          children: []
+        };
+        tree[data[i].path_lower] = item;
+      }
+    }
+    return tree;
+  };
+
+  const treeGenerator = (data, state, path) => {
+    if (data.length !== 0) {
+      const tree = state;
+
+      for (let i = 0; i < data.length; i++) {
+        if (data[i]['.tag'] === 'folder') {
+          const item = {
+            name: data[i].name,
+            path: data[i].path_lower,
+            type: data[i]['.tag'],
+            children: []
+          };
+          tree[data[i].path_lower] = item;
+          tree[path].children = data[i].path_lower;
+        }
+      }
+      return tree;
+    }
+    return state;
+  };
+
   useEffect(() => {
-    list_folder(localStorage.getItem('db_access_token'), path).then(res => {
-      setEntries(res.data.entries);
-      setLoading(false);
-    });
+    if (path === '') {
+      list_folder(localStorage.db_access_token, path).then(res => {
+        const data = treeGeneratorRoot(res.data.entries);
+        setState(data);
+      });
+    } else {
+      list_folder(localStorage.db_access_token, path).then(res => {
+        const data = treeGenerator(res.data.entries, state, path);
+        console.log(data);
+
+        setState(data);
+      });
+    }
   }, [path]);
 
-  const handleClick = entry => {
-    setPath(entry.path_display);
-    setBreadcrumb(entry.path_display.split('/'));
-    generator(entry.path_display);
-    setLoading(true);
+  const getRootNodes = () => {
+    return Object.values(state).filter(node => node.isRoot === true);
   };
 
-  const goToSelectedPath = path => {
-    console.log(path);
+  const getChildNodes = node => {
+    if (!node.children) return [];
+    return node.children.map(path => state[path]);
+  };
 
+  const rootNodes = getRootNodes();
+  console.log(state);
+
+  const openFolder = path => {
     setPath(path);
-    setBreadcrumb(path.split('/'));
-    setLoading(true);
   };
-
-  const list = !loading ? (
-    entries.map((entry, index) => (
-      <Folder key={entry.id} folder={entry} handleClick={handleClick} />
-    ))
-  ) : (
-    <div>loading...</div>
-  );
 
   return (
     <div>
-      <Breadcrumb breadcrumb={breadcrumb} goToSelectedPath={goToSelectedPath} />
-      {list}
+      {rootNodes.map((node, index) => (
+        <TreeNode
+          key={index}
+          level={0}
+          node={node}
+          getChildNodes={getChildNodes}
+          openFolder={openFolder}
+        />
+      ))}
     </div>
   );
 };
 
 export default Explorer;
 
-const Folder = ({ folder, handleClick }) => {
-  return folder['.tag'] === 'folder' ? (
-    <div
-      onClick={() => {
-        handleClick(folder);
-      }}
-    >
-      <i className="fas fa-folder" /> {folder.name}
+const TreeNode = ({ node, getChildNodes, level, openFolder }) => {
+  const childNodes = getChildNodes(node).map((childNode, index) => (
+    <TreeNode
+      key={index}
+      node={childNode}
+      getChildNodes={getChildNodes}
+      level={level + 1}
+    />
+  ));
+
+  return (
+    <div className="tree_node" style={{ paddingLeft: level * 5 + 'px' }}>
+      <div onClick={() => openFolder(node.path)}>{node.name} 22</div>
+      {childNodes}
     </div>
-  ) : null;
-};
-
-const Breadcrumb = ({ breadcrumb, goToSelectedPath }) => {
-  const breadcrumbList = breadcrumb.map((path, index) =>
-    path === '' ? (
-      <span key={index} onClick={() => goToSelectedPath('')}>
-        Main
-      </span>
-    ) : (
-      <span key={index} onClick={() => goToSelectedPath('/' + path)}>
-        /{path}
-      </span>
-    )
   );
-
-  return <div>{breadcrumbList}</div>;
-};
-
-const generator = path => {
-  const pathArray = path.split('/');
-  const breadcrumb = [];
-  for (let i = 0; i < pathArray.length; i++) {
-    const item = {
-      name: pathArray[i] === '' ? 'Main' : pathArray[i],
-      path: i === 0 ? pathArray[i] : pathArray[i - 1] + '/' + pathArray[i]
-    };
-    breadcrumb.push(item);
-  }
-  console.log(breadcrumb);
 };
